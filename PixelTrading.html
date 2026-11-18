@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PixelTrade – simulator (play money)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0b0e14;--panel:#131822;--line:#232b3a;--ink:#e8ecf4;--mute:#8590a6;--up:#22d17b;--down:#ff4757;--gold:#f0b90b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-weight:600}
+.up{color:var(--up)}.down{color:var(--down)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;letter-spacing:-.3px}
+.wallet{display:flex;align-items:center;gap:12px}
+.lbl{color:var(--mute);font-size:13px}
+.free{font:inherit;font-weight:600;font-size:14px;background:var(--gold);color:#1a1400;border:0;border-radius:8px;padding:8px 12px;cursor:pointer}
+main{max-width:1100px;margin:0 auto;padding:14px}
+.watch{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.w{font:inherit;text-align:left;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer}
+.w[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.w b{display:block}.w .r{display:flex;justify-content:space-between;margin-top:4px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:860px){.grid{grid-template-columns:1fr 320px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.grid .panel{margin-bottom:0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px}
+#px{font-size:30px}
+#ch{width:100%;height:auto;display:block;background:#0e121a;border-radius:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{font:inherit;font-weight:600;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 12px}
+.btn{font:inherit;font-weight:700;font-size:18px;border:0;border-radius:10px;padding:13px;cursor:pointer;color:#06130c;width:100%}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+#bBuy{background:var(--up)}#bSell{background:var(--down);color:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#pos{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+#pnl{font-size:26px}
+#msg{min-height:44px;font-weight:600;margin:12px 0 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.stats .mono{font-size:20px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:7px 4px;text-align:left;border-top:1px solid var(--line)}th{color:var(--mute);font-weight:500;font-size:13px;border-top:0}
+td:last-child,th:last-child{text-align:right}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ghost{font:inherit;font-size:14px;background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:6px 10px;cursor:pointer}
+.note{color:var(--mute);font-size:13px;text-align:center;margin:14px 4px}
+@media(prefers-reduced-motion:no-preference){#msg.flash{animation:fl .5s ease}@keyframes fl{from{opacity:.2}to{opacity:1}}}
+
+/* Welcome screen */
+#gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+#gate[hidden]{display:none}
+.gate-card{width:100%;max-width:440px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 22px;text-align:center}
+.gate-card svg{display:block;margin:0 auto 14px}
+.gate-card h1{margin:0 0 8px;font-size:26px;letter-spacing:-.4px}
+.gate-card p{margin:0 0 18px;color:var(--mute)}
+.gate-card .step{margin:0 0 10px}
+.gate-link{display:block;text-decoration:none;font-weight:700;text-align:center;background:var(--gold);color:#1a1400;border-radius:10px;padding:13px}
+.gate-url{display:block;margin:8px 0 18px;font-size:13px;color:var(--mute);word-break:break-all}
+.gate-btn{font:inherit;font-weight:700;font-size:16px;width:100%;border-radius:10px;padding:13px;cursor:pointer;margin-bottom:10px}
+#went{background:none;border:1px solid var(--gold);color:var(--gold)}
+#went[aria-pressed="true"]{background:var(--gold);color:#1a1400}
+#go{background:var(--up);color:#06130c;border:0;margin-bottom:0}
+#go:disabled{opacity:.3;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gt">
+  <div class="gate-card">
+    <svg width="56" height="56" viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="#0e121a" stroke="#f0b90b" stroke-width="2"></rect>
+      <g stroke-width="2" stroke-linecap="round"><line x1="11" y1="17" x2="11" y2="31" stroke="#ff4757"></line><line x1="20" y1="12" x2="20" y2="27" stroke="#22d17b"></line><line x1="29" y1="7" x2="29" y2="22" stroke="#22d17b"></line></g>
+      <rect x="8" y="21" width="6" height="7" rx="1" fill="#ff4757"></rect><rect x="17" y="16" width="6" height="8" rx="1" fill="#22d17b"></rect><rect x="26" y="11" width="6" height="8" rx="1" fill="#22d17b"></rect>
+      <path d="M7 30 L17 25 L22 27 L34 8" fill="none" stroke="#f0b90b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    <h1 id="gt">Welcome to PixelTrade</h1>
+    <p>Before you start, go to my GitHub to read my bio.</p>
+    <a class="gate-link" id="ghlink" href="https://github.com/shxdowfnbr/PixelTrade" target="_blank" rel="noopener noreferrer">Open my GitHub</a>
+    <span class="gate-url">https://github.com/shxdowfnbr/PixelTrade</span>
+    <button class="gate-btn" id="went" aria-pressed="false">I went</button>
+    <button class="gate-btn" id="go" disabled>Continue</button>
+  </div>
+</div>
+
+<header class="top">
+  <div class="brand">
+    <svg width="38" height="38" viewBox="0 0 40 40" role="img" aria-label="PixelTrade logo">
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="#0e121a" stroke="#f0b90b" stroke-width="2"></rect>
+      <g stroke-width="2" stroke-linecap="round"><line x1="11" y1="17" x2="11" y2="31" stroke="#ff4757"></line><line x1="20" y1="12" x2="20" y2="27" stroke="#22d17b"></line><line x1="29" y1="7" x2="29" y2="22" stroke="#22d17b"></line></g>
+      <rect x="8" y="21" width="6" height="7" rx="1" fill="#ff4757"></rect><rect x="17" y="16" width="6" height="8" rx="1" fill="#22d17b"></rect><rect x="26" y="11" width="6" height="8" rx="1" fill="#22d17b"></rect>
+      <path d="M7 30 L17 25 L22 27 L34 8" fill="none" stroke="#f0b90b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    PixelTrade
+  </div>
+  <div class="wallet">
+    <div><div class="lbl">Available cash</div><div class="mono" id="cash" style="font-size:20px">€1,000.00</div></div>
+    <button class="free" id="free">+ €500</button>
+  </div>
+</header>
+
+<main>
+  <section class="watch" id="watch" aria-label="Stocks"></section>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="head">
+        <div><div class="lbl" id="name"></div><div class="mono" id="px"></div></div>
+        <div class="mono" id="chg"></div>
+      </div>
+      <svg id="ch" viewBox="0 0 700 300" role="img" aria-label="Candlestick chart"></svg>
+      <div class="lbl" style="margin-top:6px">Each candle = a few seconds. Green: the price went up. Red: it went down.</div>
+    </section>
+
+    <section class="panel">
+      <div class="lbl">How much do you want to buy?</div>
+      <div class="chips" id="chips"></div>
+      <input id="custom" type="number" min="1" step="1" inputmode="numeric" placeholder="Or type your amount (€)" aria-label="Amount to invest">
+      <div class="f2">
+        <div><div class="lbl">Auto-sell if I'm up (€)</div><input id="tp" type="number" min="1" inputmode="numeric" placeholder="E.g. 20"></div>
+        <div><div class="lbl">…if I'm down (€)</div><input id="sl" type="number" min="1" inputmode="numeric" placeholder="E.g. 10"></div>
+      </div>
+      <div class="two"><button class="btn" id="bBuy">Buy</button><button class="btn" id="bSell" disabled>Sell</button></div>
+      <div id="pos" hidden>
+        <div class="lbl">Your open position</div>
+        <div class="mono" id="pnl"></div>
+        <div class="lbl" id="pinfo"></div>
+      </div>
+      <div id="msg" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <section class="panel stats" style="margin-top:12px">
+    <div><div class="lbl">Total value</div><div class="mono" id="tot">€1,000.00</div></div>
+    <div><div class="lbl">Total profit / loss</div><div class="mono up" id="tpl">+€0.00</div></div>
+    <div><div class="lbl">Winning trades</div><div class="mono" id="win">–</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="row"><strong>History</strong><button class="ghost" id="reset">Restart</button></div>
+    <table><thead><tr><th>Stock</th><th>Sell price</th><th>Result</th></tr></thead><tbody id="hist"></tbody></table>
+    <div class="lbl" id="empty">No trades yet.</div>
+  </section>
+
+  <p class="note">A game to learn: everything is fake. In real life, trading is risky, you can lose everything, and it is for adults only.</p>
+</main>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var f2=function(n){return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
+var eur=function(n){return (n<0?'-':'')+'€'+f2(Math.abs(n))};
+var sg=function(n){return (n>=0?'+':'-')+'€'+f2(Math.abs(n))};
+var DEFS=[['SPX','SuperPixel',100,.012],['BTX','Fake Bitcoin',250,.02],['GLD','Fake Gold',60,.008],['NVA','Nova Tech',35,.03]];
+var VIS=48, PER=3, cash, dep, sel, amount, hist, A, wbtn=[];
+
+/* Welcome screen */
+var went=false;
+$('went').onclick=function(){went=true;this.setAttribute('aria-pressed','true');$('go').disabled=false};
+$('go').onclick=function(){$('gate').hidden=true};
+
+function step(a){
+  var c=(Math.random()-.5)*2*a.vol+(Math.random()<.03?(Math.random()-.5)*a.vol*4:0);
+  a.price=Math.max(1,a.price*(1+c));
+}
+function init(){
+  cash=1000;dep=1000;sel=0;amount=100;hist=[];
+  A=DEFS.map(function(d){
+    var a={sym:d[0],name:d[1],price:d[2],vol:d[3],n:0,pos:null,cs:[]};
+    for(var i=0;i<VIS-8;i++){var o=a.price,h=o,l=o;for(var k=0;k<PER;k++){step(a);h=Math.max(h,a.price);l=Math.min(l,a.price)}a.cs.push({o:o,h:h,l:l,c:a.price})}
+    a.start=a.price;a.cs.push({o:a.price,h:a.price,l:a.price,c:a.price});
+    return a;
+  });
+  $('custom').value='';$('tp').value='';$('sl').value='';
+  buildWatch();buildChips();say('Pick a stock, then press Buy.');
+  renderHist();refresh();
+}
+function buildWatch(){
+  var w=$('watch');w.innerHTML='';wbtn=[];
+  A.forEach(function(a,i){
+    var b=document.createElement('button');b.className='w';
+    b.innerHTML='<b>'+a.sym+'</b><span class="lbl">'+a.name+'</span><div class="r mono"><span class="p"></span><span class="c"></span></div>';
+    b.onclick=function(){sel=i;refresh()};
+    w.appendChild(b);wbtn.push(b);
+  });
+}
+function buildChips(){
+  var c=$('chips');c.innerHTML='';
+  [10,50,100,250,'All'].forEach(function(v){
+    var b=document.createElement('button');b.className='chip';b.textContent=v==='All'?'All':'€'+v;
+    b.setAttribute('aria-pressed',String(v===amount));
+    b.onclick=function(){amount=v;$('custom').value='';buildChips()};
+    c.appendChild(b);
+  });
+}
+function say(t,cls){var m=$('msg');m.textContent=t;m.className=cls||'';if(cls){void m.offsetWidth;m.classList.add('flash')}}
+function posVal(a){return a.pos?a.pos.units*a.price:0}
+
+function draw(){
+  var a=A[sel],cs=a.cs,W=700,H=300,mn=1e9,mx=0;
+  cs.forEach(function(c){mn=Math.min(mn,c.l);mx=Math.max(mx,c.h)});
+  var p=a.pos,lv=[];
+  if(p){lv.push([p.entry,'#e8ecf4','Buy']);
+    if(p.tp)lv.push([p.entry+p.tp/p.units,'#22d17b','Auto profit']);
+    if(p.sl)lv.push([p.entry-p.sl/p.units,'#ff4757','Auto loss']);
+    lv.forEach(function(x){mn=Math.min(mn,x[0]);mx=Math.max(mx,x[0])})}
+  var pad=(mx-mn)*.1||1;mn-=pad;mx+=pad;
+  var y=function(v){return H-(v-mn)/(mx-mn)*H},cw=W/VIS,s='';
+  for(var g=1;g<5;g++){var gy=H/5*g,gv=mx-(mx-mn)/5*g;s+='<line x1="0" x2="'+W+'" y1="'+gy+'" y2="'+gy+'" stroke="#1b2230"/><text x="6" y="'+(gy-4)+'" fill="#586178" font-size="11">'+f2(gv)+'</text>'}
+  cs.forEach(function(c,i){
+    var x=(VIS-cs.length+i)*cw,col=c.c>=c.o?'#22d17b':'#ff4757',bt=y(Math.max(c.o,c.c)),bh=Math.max(1.5,Math.abs(y(c.o)-y(c.c)));
+    s+='<line x1="'+(x+cw/2)+'" x2="'+(x+cw/2)+'" y1="'+y(c.h)+'" y2="'+y(c.l)+'" stroke="'+col+'"/><rect x="'+(x+cw*.2)+'" y="'+bt+'" width="'+(cw*.6)+'" height="'+bh+'" fill="'+col+'"/>';
+  });
+  lv.forEach(function(x){var ly=y(x[0]);s+='<line x1="0" x2="'+W+'" y1="'+ly+'" y2="'+ly+'" stroke="'+x[1]+'" stroke-dasharray="6 5"/><text x="'+(W-6)+'" y="'+(ly-4)+'" fill="'+x[1]+'" font-size="12" text-anchor="end">'+x[2]+'</text>'});
+  var py=y(a.price),up=a.price>=a.cs[a.cs.length-1].o;
+  s+='<line x1="0" x2="'+W+'" y1="'+py+'" y2="'+py+'" stroke="'+(up?'#22d17b':'#ff4757')+'" stroke-width=".8" stroke-dasharray="2 3"/>';
+  $('ch').innerHTML=s;
+}
+function refresh(){
+  A.forEach(function(a,i){
+    var ch=(a.price/a.start-1)*100,b=wbtn[i];
+    b.querySelector('.p').textContent=f2(a.price);
+    var c=b.querySelector('.c');c.textContent=(ch>=0?'▲ ':'▼ ')+f2(Math.abs(ch))+'%';c.className='c '+(ch>=0?'up':'down');
+    b.setAttribute('aria-pressed',String(i===sel));
+  });
+  var a=A[sel],ch=(a.price/a.start-1)*100;
+  $('name').textContent=a.name+' ('+a.sym+')';
+  $('px').textContent=eur(a.price);
+  var cg=$('chg');cg.textContent=(ch>=0?'▲ +':'▼ ')+f2(ch)+'%';cg.className='mono '+(ch>=0?'up':'down');
+  $('cash').textContent=eur(cash);
+  var tot=cash;A.forEach(function(x){tot+=posVal(x)});
+  $('tot').textContent=eur(tot);
+  var tp=tot-dep,t=$('tpl');t.textContent=sg(tp);t.className='mono '+(tp>=0?'up':'down');
+  var w=hist.filter(function(h){return h.pl>=0}).length;
+  $('win').textContent=hist.length?w+' / '+hist.length:'–';
+  $('bBuy').disabled=!!a.pos||cash<1;$('bSell').disabled=!a.pos;
+  $('pos').hidden=!a.pos;
+  if(a.pos){var pl=posVal(a)-a.pos.cost,e=$('pnl');e.textContent=sg(pl);e.className='mono '+(pl>=0?'up':'down');
+    $('pinfo').textContent='Invested: '+eur(a.pos.cost)+' · Worth now: '+eur(posVal(a))}
+  draw();
+}
+function renderHist(){
+  var h=$('hist');h.innerHTML='';
+  hist.slice(0,8).forEach(function(r){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+r.sym+'</td><td class="mono">'+f2(r.price)+'</td><td class="mono '+(r.pl>=0?'up':'down')+'">'+sg(r.pl)+'</td>';
+    h.appendChild(tr);
+  });
+  $('empty').hidden=hist.length>0;
+}
+function closePos(a,why){
+  var val=posVal(a),pl=val-a.pos.cost;
+  cash+=val;hist.unshift({sym:a.sym,price:a.price,pl:pl});a.pos=null;
+  var pre=why?why+' ':'';
+  if(pl>=0.005)say(pre+'Nice, you made '+eur(pl)+' on '+a.sym+'!','up');
+  else if(pl<=-0.005)say(pre+'Ouch, you lost '+eur(-pl)+' on '+a.sym+'.','down');
+  else say(pre+'Break-even: no gain, no loss.');
+  renderHist();
+}
+function tick(){
+  A.forEach(function(a){
+    step(a);var c=a.cs[a.cs.length-1];
+    c.c=a.price;c.h=Math.max(c.h,a.price);c.l=Math.min(c.l,a.price);
+    a.n++;
+    if(a.n%PER===0){a.cs.push({o:a.price,h:a.price,l:a.price,c:a.price});if(a.cs.length>VIS)a.cs.shift()}
+    if(a.pos){var pl=posVal(a)-a.pos.cost;
+      if(a.pos.tp&&pl>=a.pos.tp)closePos(a,'Auto-sell!');
+      else if(a.pos.sl&&pl<=-a.pos.sl)closePos(a,'Auto-sell!')}
+  });
+  refresh();
+}
+$('custom').addEventListener('input',function(){var v=parseFloat(this.value);if(v>0){amount=v;buildChips()}});
+$('bBuy').onclick=function(){
+  var a=A[sel],spend=amount==='All'?cash:Math.min(amount,cash);
+  if(spend<1){say('You need more cash: press “+ €500”.');return}
+  var tp=parseFloat($('tp').value),sl=parseFloat($('sl').value);
+  cash-=spend;a.pos={entry:a.price,cost:spend,units:spend/a.price,tp:tp>0?tp:0,sl:sl>0?sl:0};
+  say('You bought '+a.sym+' for '+eur(spend)+'.'+(a.pos.tp||a.pos.sl?' Your auto-sell is set.':''));
+  refresh();
+};
+$('bSell').onclick=function(){closePos(A[sel],'');refresh()};
+$('free').onclick=function(){cash+=500;dep+=500;say('+€500 of play money added. It’s free, it’s a game!');refresh()};
+$('reset').onclick=init;
+init();setInterval(tick,1000);
+})();
+</script>
+
+</body></html>
