@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<!-- saved from url=(0040)https://shxdowfnbr.github.io/PixelTrade/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PixelTrade – simulator (play money)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./index_files/css2" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#0b0e14;--panel:#131822;--line:#232b3a;--ink:#e8ecf4;--mute:#8590a6;--up:#22d17b;--down:#ff4757;--gold:#f0b90b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-weight:600}
+.up{color:var(--up)}.down{color:var(--down)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;letter-spacing:-.3px}
+.wallet{display:flex;align-items:center;gap:12px}
+.lbl{color:var(--mute);font-size:13px}
+.free{font:inherit;font-weight:600;font-size:14px;background:var(--gold);color:#1a1400;border:0;border-radius:8px;padding:8px 12px;cursor:pointer}
+main{max-width:1100px;margin:0 auto;padding:14px}
+.watch{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.w{font:inherit;text-align:left;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer}
+.w[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.w b{display:block}.w .r{display:flex;justify-content:space-between;margin-top:4px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:860px){.grid{grid-template-columns:1fr 320px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.grid .panel{margin-bottom:0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px}
+#px{font-size:30px}
+#ch{width:100%;height:auto;display:block;background:#0e121a;border-radius:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{font:inherit;font-weight:600;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 12px}
+.btn{font:inherit;font-weight:700;font-size:18px;border:0;border-radius:10px;padding:13px;cursor:pointer;color:#06130c;width:100%}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+#bBuy{background:var(--up)}#bSell{background:var(--down);color:#fff}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#pos{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+#pnl{font-size:26px}
+#msg{min-height:44px;font-weight:600;margin:12px 0 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.stats .mono{font-size:20px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:7px 4px;text-align:left;border-top:1px solid var(--line)}th{color:var(--mute);font-weight:500;font-size:13px;border-top:0}
+td:last-child,th:last-child{text-align:right}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ghost{font:inherit;font-size:14px;background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:6px 10px;cursor:pointer}
+.note{color:var(--mute);font-size:13px;text-align:center;margin:14px 4px}
+@media(prefers-reduced-motion:no-preference){#msg.flash{animation:fl .5s ease}@keyframes fl{from{opacity:.2}to{opacity:1}}}
+
+/* Welcome screen */
+#gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+#gate[hidden]{display:none}
+.gate-card{width:100%;max-width:440px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 22px;text-align:center}
+.gate-card svg{display:block;margin:0 auto 14px}
+.gate-card h1{margin:0 0 8px;font-size:26px;letter-spacing:-.4px}
+.gate-card p{margin:0 0 18px;color:var(--mute)}
+.gate-card .step{margin:0 0 10px}
+.gate-link{display:block;text-decoration:none;font-weight:700;text-align:center;background:var(--gold);color:#1a1400;border-radius:10px;padding:13px}
+.gate-url{display:block;margin:8px 0 18px;font-size:13px;color:var(--mute);word-break:break-all}
+.gate-btn{font:inherit;font-weight:700;font-size:16px;width:100%;border-radius:10px;padding:13px;cursor:pointer;margin-bottom:10px}
+#went{background:none;border:1px solid var(--gold);color:var(--gold)}
+#went[aria-pressed="true"]{background:var(--gold);color:#1a1400}
+#go{background:var(--up);color:#06130c;border:0;margin-bottom:0}
+#go:disabled{opacity:.3;cursor:not-allowed}
+</style>
+<meta id="ConnectiveDocSignExtentionInstalled" name="ConnectiveDocSignExtentionInstalled" data-extension-version="1.0.11"></head>
+<body>
+
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gt" hidden="">
+  <div class="gate-card">
+    <svg width="56" height="56" viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="#0e121a" stroke="#f0b90b" stroke-width="2"></rect>
+      <g stroke-width="2" stroke-linecap="round"><line x1="11" y1="17" x2="11" y2="31" stroke="#ff4757"></line><line x1="20" y1="12" x2="20" y2="27" stroke="#22d17b"></line><line x1="29" y1="7" x2="29" y2="22" stroke="#22d17b"></line></g>
+      <rect x="8" y="21" width="6" height="7" rx="1" fill="#ff4757"></rect><rect x="17" y="16" width="6" height="8" rx="1" fill="#22d17b"></rect><rect x="26" y="11" width="6" height="8" rx="1" fill="#22d17b"></rect>
+      <path d="M7 30 L17 25 L22 27 L34 8" fill="none" stroke="#f0b90b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    <h1 id="gt">Welcome to PixelTrade</h1>
+    <p>Before you start, go to my GitHub to read my bio.</p>
+    <a class="gate-link" id="ghlink" href="https://github.com/shxdowfnbr/PixelTrade" target="_blank" rel="noopener noreferrer">Open my GitHub</a>
+    <span class="gate-url">https://github.com/shxdowfnbr/PixelTrade</span>
+    <button class="gate-btn" id="went" aria-pressed="true">I went</button>
+    <button class="gate-btn" id="go">Continue</button>
+  </div>
+</div>
+
+<header class="top">
+  <div class="brand">
+    <svg width="38" height="38" viewBox="0 0 40 40" role="img" aria-label="PixelTrade logo">
+      <rect x="1" y="1" width="38" height="38" rx="10" fill="#0e121a" stroke="#f0b90b" stroke-width="2"></rect>
+      <g stroke-width="2" stroke-linecap="round"><line x1="11" y1="17" x2="11" y2="31" stroke="#ff4757"></line><line x1="20" y1="12" x2="20" y2="27" stroke="#22d17b"></line><line x1="29" y1="7" x2="29" y2="22" stroke="#22d17b"></line></g>
+      <rect x="8" y="21" width="6" height="7" rx="1" fill="#ff4757"></rect><rect x="17" y="16" width="6" height="8" rx="1" fill="#22d17b"></rect><rect x="26" y="11" width="6" height="8" rx="1" fill="#22d17b"></rect>
+      <path d="M7 30 L17 25 L22 27 L34 8" fill="none" stroke="#f0b90b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+    PixelTrade
+  </div>
+  <div class="wallet">
+    <div><div class="lbl">Available cash</div><div class="mono" id="cash" style="font-size:20px">€121,881.72</div></div>
+    <button class="free" id="free">+ €500</button>
+  </div>
+</header>
+
+<main>
+  <section class="watch" id="watch" aria-label="Stocks"><button class="w" aria-pressed="true"><b>SPX</b><span class="lbl">SuperPixel</span><div class="r mono"><span class="p">99.32</span><span class="c up">▲ 0.22%</span></div></button><button class="w" aria-pressed="false"><b>BTX</b><span class="lbl">Bitcoin</span><div class="r mono"><span class="p">134.52</span><span class="c down">▼ 36.40%</span></div></button><button class="w" aria-pressed="false"><b>GLD</b><span class="lbl">Gold</span><div class="r mono"><span class="p">62.51</span><span class="c down">▼ 2.95%</span></div></button><button class="w" aria-pressed="false"><b>NVA</b><span class="lbl">Nova Tech</span><div class="r mono"><span class="p">46.31</span><span class="c up">▲ 69.41%</span></div></button></section>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="head">
+        <div><div class="lbl" id="name">SuperPixel (SPX)</div><div class="mono" id="px">€99.32</div></div>
+        <div class="mono up" id="chg">▲ +0.22%</div>
+      </div>
+      <svg id="ch" viewBox="0 0 700 300" role="img" aria-label="Candlestick chart"><line x1="0" x2="700" y1="60" y2="60" stroke="#1b2230"></line><text x="6" y="56" fill="#586178" font-size="11">106.45</text><line x1="0" x2="700" y1="120" y2="120" stroke="#1b2230"></line><text x="6" y="116" fill="#586178" font-size="11">101.14</text><line x1="0" x2="700" y1="180" y2="180" stroke="#1b2230"></line><text x="6" y="176" fill="#586178" font-size="11">95.84</text><line x1="0" x2="700" y1="240" y2="240" stroke="#1b2230"></line><text x="6" y="236" fill="#586178" font-size="11">90.53</text><line x1="7.291666666666667" x2="7.291666666666667" y1="267.4383036545294" y2="274.99999999999994" stroke="#22d17b"></line><rect x="2.916666666666667" y="271.0037992600901" width="8.75" height="3.9962007399098525" fill="#22d17b"></rect><line x1="21.875" x2="21.875" y1="251.84986758700236" y2="271.0037992600901" stroke="#22d17b"></line><rect x="17.5" y="251.84986758700236" width="8.75" height="19.153931673087726" fill="#22d17b"></rect><line x1="36.458333333333336" x2="36.458333333333336" y1="229.68439806818944" y2="251.84986758700236" stroke="#22d17b"></line><rect x="32.083333333333336" y="229.68439806818944" width="8.75" height="22.165469518812927" fill="#22d17b"></rect><line x1="51.041666666666664" x2="51.041666666666664" y1="225.7994049228788" y2="232.93937634315395" stroke="#ff4757"></line><rect x="46.666666666666664" y="229.68439806818944" width="8.75" height="3.2549782749645146" fill="#ff4757"></rect><line x1="65.625" x2="65.625" y1="230.86222234955343" y2="238.2416198457907" stroke="#22d17b"></line><rect x="61.25" y="232.2284435608604" width="8.75" height="1.5" fill="#22d17b"></rect><line x1="80.20833333333334" x2="80.20833333333334" y1="221.4367140786185" y2="232.2284435608604" stroke="#22d17b"></line><rect x="75.83333333333334" y="224.88717232198738" width="8.75" height="7.34127123887302" fill="#22d17b"></rect><line x1="94.79166666666667" x2="94.79166666666667" y1="223.22245177727507" y2="227.5496850331617" stroke="#22d17b"></line><rect x="90.41666666666667" y="223.22245177727507" width="8.75" height="1.66472054471231" fill="#22d17b"></rect><line x1="109.37500000000001" x2="109.37500000000001" y1="192.47282140949775" y2="227.17440566714345" stroke="#22d17b"></line><rect x="105.00000000000001" y="192.47282140949775" width="8.75" height="30.749630367777314" fill="#22d17b"></rect><line x1="123.95833333333334" x2="123.95833333333334" y1="173.3789389217181" y2="192.47282140949775" stroke="#22d17b"></line><rect x="119.58333333333334" y="173.3789389217181" width="8.75" height="19.093882487779666" fill="#22d17b"></rect><line x1="138.54166666666666" x2="138.54166666666666" y1="156.69250632642635" y2="173.3789389217181" stroke="#22d17b"></line><rect x="134.16666666666666" y="159.2968217809797" width="8.75" height="14.082117140738376" fill="#22d17b"></rect><line x1="153.125" x2="153.125" y1="153.98933174373298" y2="159.2968217809797" stroke="#22d17b"></line><rect x="148.75" y="153.98933174373298" width="8.75" height="5.307490037246737" fill="#22d17b"></rect><line x1="167.70833333333334" x2="167.70833333333334" y1="140.47743824954824" y2="155.0388738104763" stroke="#22d17b"></line><rect x="163.33333333333334" y="140.47743824954824" width="8.75" height="13.511893494184733" fill="#22d17b"></rect><line x1="182.29166666666666" x2="182.29166666666666" y1="133.0068985211548" y2="145.7001434351572" stroke="#22d17b"></line><rect x="177.91666666666666" y="134.13523633261642" width="8.75" height="6.3422019169318276" fill="#22d17b"></rect><line x1="196.875" x2="196.875" y1="113.23732342488873" y2="134.13523633261642" stroke="#22d17b"></line><rect x="192.5" y="126.28852103868354" width="8.75" height="7.846715293932874" fill="#22d17b"></rect><line x1="211.45833333333334" x2="211.45833333333334" y1="110.80669525282656" y2="126.28852103868354" stroke="#22d17b"></line><rect x="207.08333333333334" y="110.80669525282656" width="8.75" height="15.481825785856984" fill="#22d17b"></rect><line x1="226.04166666666666" x2="226.04166666666666" y1="104.47364518039828" y2="119.9761354090916" stroke="#ff4757"></line><rect x="221.66666666666666" y="110.80669525282656" width="8.75" height="9.16944015626504" fill="#ff4757"></rect><line x1="240.625" x2="240.625" y1="117.91172261904674" y2="122.82417719735156" stroke="#ff4757"></line><rect x="236.25" y="119.9761354090916" width="8.75" height="2.8480417882599625" fill="#ff4757"></rect><line x1="255.20833333333334" x2="255.20833333333334" y1="119.07037511257656" y2="123.10671350705968" stroke="#22d17b"></line><rect x="250.83333333333334" y="119.07037511257656" width="8.75" height="3.7538020847750033" fill="#22d17b"></rect><line x1="269.7916666666667" x2="269.7916666666667" y1="101.75323625902905" y2="119.07037511257656" stroke="#22d17b"></line><rect x="265.4166666666667" y="111.3676598970016" width="8.75" height="7.702715215574955" fill="#22d17b"></rect><line x1="284.37500000000006" x2="284.37500000000006" y1="111.3676598970016" y2="130.5981197218025" stroke="#ff4757"></line><rect x="280.00000000000006" y="111.3676598970016" width="8.75" height="19.230459824800903" fill="#ff4757"></rect><line x1="298.95833333333337" x2="298.95833333333337" y1="108.77716298061236" y2="130.5981197218025" stroke="#22d17b"></line><rect x="294.58333333333337" y="108.77716298061236" width="8.75" height="21.820956741190145" fill="#22d17b"></rect><line x1="313.5416666666667" x2="313.5416666666667" y1="104.39139712833725" y2="121.79016040511283" stroke="#ff4757"></line><rect x="309.1666666666667" y="108.77716298061236" width="8.75" height="13.012997424500469" fill="#ff4757"></rect><line x1="328.12500000000006" x2="328.12500000000006" y1="121.79016040511283" y2="130.3371686203463" stroke="#ff4757"></line><rect x="323.75000000000006" y="121.79016040511283" width="8.75" height="2.5654886347246304" fill="#ff4757"></rect><line x1="342.70833333333337" x2="342.70833333333337" y1="124.35564903983746" y2="142.06781794963808" stroke="#ff4757"></line><rect x="338.33333333333337" y="124.35564903983746" width="8.75" height="2.373388000041558" fill="#ff4757"></rect><line x1="357.2916666666667" x2="357.2916666666667" y1="115.96526346011424" y2="126.78065684102512" stroke="#22d17b"></line><rect x="352.9166666666667" y="119.43031776931366" width="8.75" height="7.298719270565357" fill="#22d17b"></rect><line x1="371.87500000000006" x2="371.87500000000006" y1="119.43031776931366" y2="136.67751735045377" stroke="#ff4757"></line><rect x="367.50000000000006" y="119.43031776931366" width="8.75" height="1.5" fill="#ff4757"></rect><line x1="386.45833333333337" x2="386.45833333333337" y1="115.84728668931533" y2="124.36614397709496" stroke="#22d17b"></line><rect x="382.08333333333337" y="115.84728668931533" width="8.75" height="4.98283878530961" fill="#22d17b"></rect><line x1="401.0416666666667" x2="401.0416666666667" y1="105.11898830304574" y2="123.83687200823456" stroke="#ff4757"></line><rect x="396.6666666666667" y="115.84728668931533" width="8.75" height="7.989585318919239" fill="#ff4757"></rect><line x1="415.62500000000006" x2="415.62500000000006" y1="108.23179220831872" y2="130.14543756976204" stroke="#22d17b"></line><rect x="411.25000000000006" y="108.23179220831872" width="8.75" height="15.605079799915842" fill="#22d17b"></rect><line x1="430.20833333333337" x2="430.20833333333337" y1="108.23179220831872" y2="132.46162913320234" stroke="#ff4757"></line><rect x="425.83333333333337" y="108.23179220831872" width="8.75" height="24.229836924883614" fill="#ff4757"></rect><line x1="444.7916666666667" x2="444.7916666666667" y1="127.49464049088286" y2="132.46162913320234" stroke="#22d17b"></line><rect x="440.4166666666667" y="131.2352894919665" width="8.75" height="1.5" fill="#22d17b"></rect><line x1="459.37500000000006" x2="459.37500000000006" y1="111.84837309106501" y2="131.2352894919665" stroke="#22d17b"></line><rect x="455.00000000000006" y="111.84837309106501" width="8.75" height="19.386916400901498" fill="#22d17b"></rect><line x1="473.95833333333337" x2="473.95833333333337" y1="96.25597307919713" y2="111.84837309106501" stroke="#22d17b"></line><rect x="469.58333333333337" y="96.25597307919713" width="8.75" height="15.59240001186788" fill="#22d17b"></rect><line x1="488.5416666666667" x2="488.5416666666667" y1="76.85672320776581" y2="96.25597307919713" stroke="#22d17b"></line><rect x="484.1666666666667" y="76.85672320776581" width="8.75" height="19.399249871431323" fill="#22d17b"></rect><line x1="503.12500000000006" x2="503.12500000000006" y1="71.18053765134363" y2="82.9715770529439" stroke="#22d17b"></line><rect x="498.75000000000006" y="71.18053765134363" width="8.75" height="5.676185556422183" fill="#22d17b"></rect><line x1="517.7083333333334" x2="517.7083333333334" y1="59.992925144508206" y2="71.18053765134363" stroke="#22d17b"></line><rect x="513.3333333333334" y="67.34878800907782" width="8.75" height="3.8317496422658053" fill="#22d17b"></rect><line x1="532.2916666666666" x2="532.2916666666666" y1="56.43763959688948" y2="68.76134527501753" stroke="#22d17b"></line><rect x="527.9166666666666" y="56.43763959688948" width="8.75" height="10.91114841218834" fill="#22d17b"></rect><line x1="546.875" x2="546.875" y1="44.50215851987707" y2="56.43763959688948" stroke="#22d17b"></line><rect x="542.5" y="51.96499790434942" width="8.75" height="4.472641692540066" fill="#22d17b"></rect><line x1="561.4583333333334" x2="561.4583333333334" y1="25.000000000000057" y2="51.96499790434942" stroke="#22d17b"></line><rect x="557.0833333333334" y="25.000000000000057" width="8.75" height="26.96499790434936" fill="#22d17b"></rect><line x1="576.0416666666666" x2="576.0416666666666" y1="25.000000000000057" y2="78.73894947123316" stroke="#ff4757"></line><rect x="571.6666666666666" y="25.000000000000057" width="8.75" height="53.7389494712331" fill="#ff4757"></rect><line x1="590.625" x2="590.625" y1="70.84418145128583" y2="78.73894947123316" stroke="#22d17b"></line><rect x="586.25" y="75.71282963413029" width="8.75" height="3.0261198371028684" fill="#22d17b"></rect><line x1="605.2083333333334" x2="605.2083333333334" y1="75.71282963413029" y2="90.08869668318604" stroke="#ff4757"></line><rect x="600.8333333333334" y="75.71282963413029" width="8.75" height="14.375867049055756" fill="#ff4757"></rect><line x1="619.7916666666666" x2="619.7916666666666" y1="76.25335513425205" y2="90.08869668318604" stroke="#22d17b"></line><rect x="615.4166666666666" y="83.6713177423922" width="8.75" height="6.417378940793839" fill="#22d17b"></rect><line x1="634.375" x2="634.375" y1="61.664694884847734" y2="83.6713177423922" stroke="#22d17b"></line><rect x="630" y="61.664694884847734" width="8.75" height="22.00662285754447" fill="#22d17b"></rect><line x1="648.9583333333334" x2="648.9583333333334" y1="61.664694884847734" y2="92.61789054917898" stroke="#ff4757"></line><rect x="644.5833333333334" y="61.664694884847734" width="8.75" height="30.953195664331247" fill="#ff4757"></rect><line x1="663.5416666666666" x2="663.5416666666666" y1="91.81342709699547" y2="114.38486184891428" stroke="#ff4757"></line><rect x="659.1666666666666" y="92.61789054917898" width="8.75" height="21.766971299735303" fill="#ff4757"></rect><line x1="678.125" x2="678.125" y1="114.38486184891428" y2="133.3440814825569" stroke="#ff4757"></line><rect x="673.75" y="114.38486184891428" width="8.75" height="15.22304147530761" fill="#ff4757"></rect><line x1="692.7083333333334" x2="692.7083333333334" y1="129.6079033242219" y2="140.6385783060422" stroke="#ff4757"></line><rect x="688.3333333333334" y="129.6079033242219" width="8.75" height="11.030674981820312" fill="#ff4757"></rect><line x1="0" x2="700" y1="140.6385783060422" y2="140.6385783060422" stroke="#ff4757" stroke-width=".8" stroke-dasharray="2 3"></line></svg>
+      <div class="lbl" style="margin-top:6px">Each candle = a few seconds. Green: the price went up. Red: it went down.</div>
+    </section>
+
+    <section class="panel">
+      <div class="lbl">How much do you want to buy?</div>
+      <div class="chips" id="chips"><button class="chip" aria-pressed="false">€10</button><button class="chip" aria-pressed="false">€50</button><button class="chip" aria-pressed="false">€100</button><button class="chip" aria-pressed="false">€250</button><button class="chip" aria-pressed="false">All</button></div>
+      <input id="custom" type="number" min="1" step="1" inputmode="numeric" placeholder="Or type your amount (€)" aria-label="Amount to invest">
+      <div class="f2">
+        <div><div class="lbl">Auto-sell if I'm up (€)</div><input id="tp" type="number" min="1" inputmode="numeric" placeholder="E.g. 20"></div>
+        <div><div class="lbl">…if I'm down (€)</div><input id="sl" type="number" min="1" inputmode="numeric" placeholder="E.g. 10"></div>
+      </div>
+      <div class="two"><button class="btn" id="bBuy">Buy</button><button class="btn" id="bSell" disabled="">Sell</button></div>
+      <div id="pos" hidden="">
+        <div class="lbl">Your open position</div>
+        <div class="mono up" id="pnl">+€768.13</div>
+        <div class="lbl" id="pinfo">Invested: €20,000.00 · Worth now: €20,768.13</div>
+      </div>
+      <div id="msg" aria-live="polite" class="up flash">Nice, you made €768.13 on SPX!</div>
+    </section>
+  </div>
+
+  <section class="panel stats" style="margin-top:12px">
+    <div><div class="lbl">Total value</div><div class="mono" id="tot">€121,881.72</div></div>
+    <div><div class="lbl">Total profit / loss</div><div class="mono up" id="tpl">+€21,881.72</div></div>
+    <div><div class="lbl">Winning trades</div><div class="mono" id="win">12 / 17</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="row"><strong>History</strong><button class="ghost" id="reset">Restart</button></div>
+    <table><thead><tr><th>Stock</th><th>Sell price</th><th>Result</th></tr></thead><tbody id="hist"><tr><td>SPX</td><td class="mono">106.06</td><td class="mono up">+€768.13</td></tr><tr><td>SPX</td><td class="mono">98.87</td><td class="mono up">+€11,807.68</td></tr><tr><td>NVA</td><td class="mono">50.96</td><td class="mono up">+€967.31</td></tr><tr><td>NVA</td><td class="mono">51.83</td><td class="mono up">+€8,163.60</td></tr><tr><td>NVA</td><td class="mono">56.62</td><td class="mono up">+€261.46</td></tr><tr><td>SPX</td><td class="mono">88.41</td><td class="mono down">-€84.00</td></tr><tr><td>SPX</td><td class="mono">88.26</td><td class="mono down">-€276.36</td></tr><tr><td>SPX</td><td class="mono">103.37</td><td class="mono up">+€174.93</td></tr></tbody></table>
+    <div class="lbl" id="empty" hidden="">No trades yet.</div>
+  </section>
+
+  <p class="note">A game to learn: everything is fake. In real life, trading is risky, you can lose everything, and it is for adults only.</p>
+</main>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var f2=function(n){return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
+var eur=function(n){return (n<0?'-':'')+'€'+f2(Math.abs(n))};
+var sg=function(n){return (n>=0?'+':'-')+'€'+f2(Math.abs(n))};
+var DEFS=[['SPX','SuperPixel',100,.012],['BTX','Bitcoin',250,.02],['GLD','Gold',60,.008],['NVA','Nova Tech',35,.03],['ETH','Ethereum',140,.022],['TSL','Volt Motors',80,.028],['AAP','Pomme Inc.',120,.014],['OIL','Pétrole',45,.016],['AMZ','Fleuve Market',95,.015],['MSF','Micro Logic',110,.013]];
+var VIS=48, PER=3, cash, dep, sel, amount, hist, A, wbtn=[];
+
+/* Welcome screen */
+var went=false;
+$('went').onclick=function(){went=true;this.setAttribute('aria-pressed','true');$('go').disabled=false};
+$('go').onclick=function(){$('gate').hidden=true};
+
+function step(a){
+  var c=(Math.random()-.5)*2*a.vol+(Math.random()<.03?(Math.random()-.5)*a.vol*4:0);
+  a.price=Math.max(1,a.price*(1+c));
+}
+var KEY='tradingDemoSave1';
+function save(){try{localStorage.setItem(KEY,JSON.stringify({cash:cash,dep:dep,sel:sel,hist:hist.slice(0,50),A:A.map(function(a){return{sym:a.sym,price:a.price,start:a.start,n:a.n,pos:a.pos,cs:a.cs}})}))}catch(e){}}
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(!d||!isFinite(d.cash)||!d.A)return false;
+  d.A.forEach(function(sv){A.forEach(function(a){if(a.sym===sv.sym&&sv.cs&&sv.cs.length){a.price=sv.price;a.start=sv.start;a.n=sv.n;a.pos=sv.pos;a.cs=sv.cs}})});
+  cash=d.cash;dep=d.dep;sel=Math.min(d.sel||0,A.length-1);hist=d.hist||[];return true}catch(e){return false}}
+function init(fresh){
+  cash=1000;dep=1000;sel=0;amount=100;hist=[];
+  A=DEFS.map(function(d){
+    var a={sym:d[0],name:d[1],price:d[2],vol:d[3],n:0,pos:null,cs:[]};
+    for(var i=0;i<VIS-8;i++){var o=a.price,h=o,l=o;for(var k=0;k<PER;k++){step(a);h=Math.max(h,a.price);l=Math.min(l,a.price)}a.cs.push({o:o,h:h,l:l,c:a.price})}
+    a.start=a.price;a.cs.push({o:a.price,h:a.price,l:a.price,c:a.price});
+    return a;
+  });
+  var loaded=fresh===true?false:load();
+  $('custom').value='';$('tp').value='';$('sl').value='';
+  buildWatch();buildChips();say(loaded?'Welcome back! Your progress was saved.':'Pick a stock, then press Buy.');
+  renderHist();refresh();
+}
+function buildWatch(){
+  var w=$('watch');w.innerHTML='';wbtn=[];
+  A.forEach(function(a,i){
+    var b=document.createElement('button');b.className='w';
+    b.innerHTML='<b>'+a.sym+'</b><span class="lbl">'+a.name+'</span><div class="r mono"><span class="p"></span><span class="c"></span></div>';
+    b.onclick=function(){sel=i;refresh()};
+    w.appendChild(b);wbtn.push(b);
+  });
+}
+function buildChips(){
+  var c=$('chips');c.innerHTML='';
+  [10,50,100,250,'All'].forEach(function(v){
+    var b=document.createElement('button');b.className='chip';b.textContent=v==='All'?'All':'€'+v;
+    b.setAttribute('aria-pressed',String(v===amount));
+    b.onclick=function(){amount=v;$('custom').value='';buildChips()};
+    c.appendChild(b);
+  });
+}
+function say(t,cls){var m=$('msg');m.textContent=t;m.className=cls||'';if(cls){void m.offsetWidth;m.classList.add('flash')}}
+function posVal(a){return a.pos?a.pos.units*a.price:0}
+
+function draw(){
+  var a=A[sel],cs=a.cs,W=700,H=300,mn=1e9,mx=0;
+  cs.forEach(function(c){mn=Math.min(mn,c.l);mx=Math.max(mx,c.h)});
+  var p=a.pos,lv=[];
+  if(p){lv.push([p.entry,'#e8ecf4','Buy']);
+    if(p.tp)lv.push([p.entry+p.tp/p.units,'#22d17b','Auto profit']);
+    if(p.sl)lv.push([p.entry-p.sl/p.units,'#ff4757','Auto loss']);
+    lv.forEach(function(x){mn=Math.min(mn,x[0]);mx=Math.max(mx,x[0])})}
+  var pad=(mx-mn)*.1||1;mn-=pad;mx+=pad;
+  var y=function(v){return H-(v-mn)/(mx-mn)*H},cw=W/VIS,s='';
+  for(var g=1;g<5;g++){var gy=H/5*g,gv=mx-(mx-mn)/5*g;s+='<line x1="0" x2="'+W+'" y1="'+gy+'" y2="'+gy+'" stroke="#1b2230"/><text x="6" y="'+(gy-4)+'" fill="#586178" font-size="11">'+f2(gv)+'</text>'}
+  cs.forEach(function(c,i){
+    var x=(VIS-cs.length+i)*cw,col=c.c>=c.o?'#22d17b':'#ff4757',bt=y(Math.max(c.o,c.c)),bh=Math.max(1.5,Math.abs(y(c.o)-y(c.c)));
+    s+='<line x1="'+(x+cw/2)+'" x2="'+(x+cw/2)+'" y1="'+y(c.h)+'" y2="'+y(c.l)+'" stroke="'+col+'"/><rect x="'+(x+cw*.2)+'" y="'+bt+'" width="'+(cw*.6)+'" height="'+bh+'" fill="'+col+'"/>';
+  });
+  lv.forEach(function(x){var ly=y(x[0]);s+='<line x1="0" x2="'+W+'" y1="'+ly+'" y2="'+ly+'" stroke="'+x[1]+'" stroke-dasharray="6 5"/><text x="'+(W-6)+'" y="'+(ly-4)+'" fill="'+x[1]+'" font-size="12" text-anchor="end">'+x[2]+'</text>'});
+  var py=y(a.price),up=a.price>=a.cs[a.cs.length-1].o;
+  s+='<line x1="0" x2="'+W+'" y1="'+py+'" y2="'+py+'" stroke="'+(up?'#22d17b':'#ff4757')+'" stroke-width=".8" stroke-dasharray="2 3"/>';
+  $('ch').innerHTML=s;
+}
+function refresh(){
+  A.forEach(function(a,i){
+    var ch=(a.price/a.start-1)*100,b=wbtn[i];
+    b.querySelector('.p').textContent=f2(a.price);
+    var c=b.querySelector('.c');c.textContent=(ch>=0?'▲ ':'▼ ')+f2(Math.abs(ch))+'%';c.className='c '+(ch>=0?'up':'down');
+    b.setAttribute('aria-pressed',String(i===sel));
+  });
+  var a=A[sel],ch=(a.price/a.start-1)*100;
+  $('name').textContent=a.name+' ('+a.sym+')';
+  $('px').textContent=eur(a.price);
+  var cg=$('chg');cg.textContent=(ch>=0?'▲ +':'▼ ')+f2(ch)+'%';cg.className='mono '+(ch>=0?'up':'down');
+  $('cash').textContent=eur(cash);
+  var tot=cash;A.forEach(function(x){tot+=posVal(x)});
+  $('tot').textContent=eur(tot);
+  var tp=tot-dep,t=$('tpl');t.textContent=sg(tp);t.className='mono '+(tp>=0?'up':'down');
+  var w=hist.filter(function(h){return h.pl>=0}).length;
+  $('win').textContent=hist.length?w+' / '+hist.length:'–';
+  $('bBuy').disabled=!!a.pos||cash<1;$('bSell').disabled=!a.pos;
+  $('pos').hidden=!a.pos;
+  if(a.pos){var pl=posVal(a)-a.pos.cost,e=$('pnl');e.textContent=sg(pl);e.className='mono '+(pl>=0?'up':'down');
+    $('pinfo').textContent='Invested: '+eur(a.pos.cost)+' · Worth now: '+eur(posVal(a))}
+  draw();save();
+}
+function renderHist(){
+  var h=$('hist');h.innerHTML='';
+  hist.slice(0,8).forEach(function(r){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+r.sym+'</td><td class="mono">'+f2(r.price)+'</td><td class="mono '+(r.pl>=0?'up':'down')+'">'+sg(r.pl)+'</td>';
+    h.appendChild(tr);
+  });
+  $('empty').hidden=hist.length>0;
+}
+function closePos(a,why){
+  var val=posVal(a),pl=val-a.pos.cost;
+  cash+=val;hist.unshift({sym:a.sym,price:a.price,pl:pl});a.pos=null;
+  var pre=why?why+' ':'';
+  if(pl>=0.005)say(pre+'Nice, you made '+eur(pl)+' on '+a.sym+'!','up');
+  else if(pl<=-0.005)say(pre+'Ouch, you lost '+eur(-pl)+' on '+a.sym+'.','down');
+  else say(pre+'Break-even: no gain, no loss.');
+  renderHist();
+}
+function tick(){
+  A.forEach(function(a){
+    step(a);var c=a.cs[a.cs.length-1];
+    c.c=a.price;c.h=Math.max(c.h,a.price);c.l=Math.min(c.l,a.price);
+    a.n++;
+    if(a.n%PER===0){a.cs.push({o:a.price,h:a.price,l:a.price,c:a.price});if(a.cs.length>VIS)a.cs.shift()}
+    if(a.pos){var pl=posVal(a)-a.pos.cost;
+      if(a.pos.tp&&pl>=a.pos.tp)closePos(a,'Auto-sell!');
+      else if(a.pos.sl&&pl<=-a.pos.sl)closePos(a,'Auto-sell!')}
+  });
+  refresh();
+}
+$('custom').addEventListener('input',function(){var v=parseFloat(this.value);if(v>0){amount=v;buildChips()}});
+$('bBuy').onclick=function(){
+  var a=A[sel],spend=amount==='All'?cash:Math.min(amount,cash);
+  if(spend<1){say('You need more cash: press “+ €500”.');return}
+  var tp=parseFloat($('tp').value),sl=parseFloat($('sl').value);
+  cash-=spend;a.pos={entry:a.price,cost:spend,units:spend/a.price,tp:tp>0?tp:0,sl:sl>0?sl:0};
+  say('You bought '+a.sym+' for '+eur(spend)+'.'+(a.pos.tp||a.pos.sl?' Your auto-sell is set.':''));
+  refresh();
+};
+$('bSell').onclick=function(){closePos(A[sel],'');refresh()};
+$('free').onclick=function(){cash+=500;dep+=500;say('+€500 of play money added. It’s free, it’s a game!');refresh()};
+$('reset').onclick=function(){try{localStorage.removeItem(KEY)}catch(e){}init(true)};
+init();setInterval(tick,1000);
+})();
+</script>
+
+
+</body></html>
